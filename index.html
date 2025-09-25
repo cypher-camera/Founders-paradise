@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrindPay - Founder Investor Platform</title>
+    <!-- Firebase Web SDK v9 -->
+    <script type="module" src="app.js"></script>
+</head>
+<body>
+    <!-- 
+    FIREBASE SETUP INSTRUCTIONS:
+    1. Enable Authentication in Firebase Console (Email/Password provider)
+    2. Enable Firestore Database
+    3. Enable Cloud Storage
+    4. Deploy the provided security rules to Firestore
+    5. Optional: Deploy the Cloud Function for email notifications
+    -->
+
+    <!-- Navigation Header -->
+    <header id="header" style="display: none;">
+        <h1>GrindPay</h1>
+        <nav>
+            <button id="feedBtn" onclick="showFeed()">Feed</button>
+            <button id="uploadBtn" onclick="showUpload()" style="display: none;">Upload</button>
+            <button id="dashboardBtn" onclick="showDashboard()" style="display: none;">Dashboard</button>
+            <button id="coursesBtn" onclick="showCourses()">Courses</button>
+            <button id="logoutBtn" onclick="logout()">Logout</button>
+        </nav>
+        <div id="userInfo"></div>
+        <div id="searchContainer">
+            <input type="text" id="searchInput" placeholder="Search posts..." onkeyup="searchPosts()">
+        </div>
+    </header>
+
+    <!-- Authentication Section -->
+    <section id="authSection">
+        <h2>Welcome to GrindPay</h2>
+        <p>Connect founders with investors</p>
+        
+        <div id="loginForm">
+            <h3>Sign In / Sign Up</h3>
+            <form id="authForm" onsubmit="return false;">
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+                <br><br>
+                
+                <label for="password">Password:</label>
+                <input type="password" id="password" required>
+                <br><br>
+                
+                <label for="displayName">Display Name:</label>
+                <input type="text" id="displayName">
+                <br><br>
+                
+                <fieldset id="roleSelection">
+                    <legend>Select Your Role:</legend>
+                    <input type="radio" id="founder" name="role" value="founder">
+                    <label for="founder">Founder</label>
+                    <br>
+                    <input type="radio" id="investor" name="role" value="investor">
+                    <label for="investor">Investor</label>
+                </fieldset>
+                <br>
+                
+                <button type="button" onclick="signUp()">Sign Up</button>
+                <button type="button" onclick="signIn()">Sign In</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main id="mainContent" style="display: none;">
+
+        <!-- Feed Section -->
+        <section id="feedSection">
+            <h2>Latest Posts</h2>
+            <div id="sortOptions">
+                <label>Sort by:</label>
+                <select id="sortSelect" onchange="sortPosts()">
+                    <option value="likes">Most Liked</option>
+                    <option value="recent">Most Recent</option>
+                </select>
+            </div>
+            <div id="postsContainer"></div>
+            <button id="loadMoreBtn" onclick="loadMorePosts()" style="display: none;">Load More</button>
+        </section>
+
+        <!-- Upload Section (Founder Only) -->
+        <section id="uploadSection" style="display: none;">
+            <h2>Create New Post</h2>
+            <form id="uploadForm" onsubmit="return false;">
+                <label>Post Type:</label>
+                <input type="radio" name="postType" value="video" checked onchange="toggleUploadFields()"> Video
+                <input type="radio" name="postType" value="blog" onchange="toggleUploadFields()"> Blog Post
+                <br><br>
+                
+                <label for="postTitle">Title:</label>
+                <input type="text" id="postTitle" required maxlength="100">
+                <br><br>
+                
+                <label for="postDescription">Description:</label>
+                <textarea id="postDescription" required rows="4" cols="50"></textarea>
+                <br><br>
+                
+                <label for="postTags">Tags (comma separated):</label>
+                <input type="text" id="postTags" placeholder="startup, funding, tech">
+                <br><br>
+                
+                <div id="videoUploadSection">
+                    <label for="videoFile">Video File (MP4):</label>
+                    <input type="file" id="videoFile" accept="video/mp4">
+                    <br><br>
+                </div>
+                
+                <button type="button" onclick="createPost()">Create Post</button>
+                <div id="uploadProgress" style="display: none;">
+                    <p>Uploading... <span id="progressPercent">0%</span></p>
+                </div>
+            </form>
+        </section>
+
+        <!-- Dashboard Section (Founder Only) -->
+        <section id="dashboardSection" style="display: none;">
+            <h2>Founder Dashboard</h2>
+            <div id="dashboardStats">
+                <h3>Statistics</h3>
+                <p>Total Uploads: <span id="totalUploads">0</span></p>
+                <p>Total Likes: <span id="totalLikes">0</span></p>
+                <p>Meetings Arranged: <input type="number" id="meetingsArranged" value="0" onchange="updateMeetingStats()"></p>
+                <p>Meetings Successful: <input type="number" id="meetingsSuccessful" value="0" onchange="updateMeetingStats()"></p>
+            </div>
+            
+            <div id="myPostsSection">
+                <h3>My Posts</h3>
+                <div id="myPostsList"></div>
+            </div>
+        </section>
+
+        <!-- Courses Section -->
+        <section id="coursesSection" style="display: none;">
+            <h2>Available Courses</h2>
+            <div id="coursesList"></div>
+        </section>
+
+        <!-- Post Detail View -->
+        <section id="postDetailSection" style="display: none;">
+            <button onclick="hidePostDetail()">← Back to Feed</button>
+            <div id="postDetailContent"></div>
+            
+            <div id="videoPlayerSection" style="display: none;">
+                <video id="videoPlayer" controls width="100%" height="400"></video>
+            </div>
+            
+            <div id="postActions">
+                <button id="likeBtn" onclick="toggleLike()">Like</button>
+                <span id="likeCount">0</span> likes
+                <br><br>
+                
+                <div id="messageSection">
+                    <h4>Send Message to Creator</h4>
+                    <textarea id="messageText" placeholder="Write your message..." rows="3" cols="50"></textarea>
+                    <button onclick="sendMessage()">Send Message</button>
+                    
+                    <h4>Messages</h4>
+                    <div id="messagesContainer"></div>
+                </div>
+                
+                <div id="meetingSection">
+                    <button onclick="arrangeMeeting()">Arrange Meeting</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Loading Indicator -->
+    <div id="loading" style="display: none;">
+        <p>Loading...</p>
+    </div>
+
+    <!-- 
+    SAMPLE FIRESTORE SECURITY RULES:
+    Copy this to your Firestore Rules tab in Firebase Console:
+    
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        match /users/{userId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+        match /posts/{postId} {
+          allow read: if true;
+          allow create: if request.auth != null && request.auth.uid == request.resource.data.ownerId;
+          allow update, delete: if request.auth != null && request.auth.uid == resource.data.ownerId;
+        }
+        match /likes/{likeId} {
+          allow read: if true;
+          allow create, delete: if request.auth != null;
+        }
+        match /messages/{messageId} {
+          allow read: if request.auth != null && (request.auth.uid == resource.data.fromUserId || request.auth.uid == resource.data.toUserId);
+          allow create: if request.auth != null && request.auth.uid == request.resource.data.fromUserId;
+        }
+        match /meetings/{meetingId} {
+          allow read: if request.auth != null && (request.auth.uid == resource.data.fromUserId || request.auth.uid == resource.data.toUserId);
+          allow create: if request.auth != null && request.auth.uid == request.resource.data.fromUserId;
+        }
+        match /courses/{courseId} {
+          allow read: if true;
+        }
+      }
+    }
+    -->
+
+</body>
+</html>
