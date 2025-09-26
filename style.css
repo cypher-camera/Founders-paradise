@@ -738,7 +738,7 @@ select.form-control {
 }
 
 /* END PERPLEXITY DESIGN SYSTEM */
-
+```css
 /* =====================================
    CSS VARIABLES & ROOT STYLES
    ===================================== */
@@ -1865,3 +1865,4 @@ a:hover {
     border: 2px solid var(--color-border);
   }
 }
+```
