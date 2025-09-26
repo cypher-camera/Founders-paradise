@@ -38,7 +38,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyDriQPKMdRHKKRzlPVXxCCKVgp5EbFOSNg",
     authDomain: "grindpay.firebaseapp.com",
     projectId: "grindpay",
-    storage : getStorage(app, "gs://grindpay.firebasestorage.app"),
+    storageBucket: "grindpay.firebasestorage.app",
     messagingSenderId: "366294485530",
     appId: "1:366294485530:web:477d43906292f347d81fa3",
     measurementId: "G-C6TYPKSXGP"
