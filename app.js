@@ -38,7 +38,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyDriQPKMdRHKKRzlPVXxCCKVgp5EbFOSNg",
     authDomain: "grindpay.firebaseapp.com",
     projectId: "grindpay",
-    storageBucket: "grindpay.appspot.com",
+    storage : getStorage(app, "gs://grindpay.firebasestorage.app"),
     messagingSenderId: "366294485530",
     appId: "1:366294485530:web:477d43906292f347d81fa3",
     measurementId: "G-C6TYPKSXGP"
@@ -1018,7 +1018,7 @@ window.searchPosts = searchPosts;
 window.sortPosts = sortPosts;
 window.loadMorePosts = loadMorePosts;
 
-/*
+
 FIREBASE CLOUD FUNCTION FOR EMAIL SENDING:
 Deploy this function to Firebase Functions to enable real email sending:
 
