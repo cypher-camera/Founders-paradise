@@ -1018,7 +1018,7 @@ window.searchPosts = searchPosts;
 window.sortPosts = sortPosts;
 window.loadMorePosts = loadMorePosts;
 
-
+/*
 FIREBASE CLOUD FUNCTION FOR EMAIL SENDING:
 Deploy this function to Firebase Functions to enable real email sending:
 
